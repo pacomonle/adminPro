@@ -4,10 +4,12 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { PagesModule } from './pages/pages.module';
 import { AuthModule } from './auth/auth.module';
+import { ComponentsModule } from './components/components.module';
 
 // componentes
 import { AppComponent } from './app.component';
 import { Error404Component } from './error404/error404.component';
+
 
 
 
@@ -23,7 +25,8 @@ import { Error404Component } from './error404/error404.component';
     BrowserModule,
     AppRoutingModule,
     PagesModule,
-    AuthModule
+    AuthModule,
+    ComponentsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
