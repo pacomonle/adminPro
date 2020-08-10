@@ -6,6 +6,7 @@ generar modulos en angular
 libreria de graficas para angular
 # npm install --save ng2-charts
 # npm install --save chart.js
+# en el index.html - <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.0.
 
