@@ -6,6 +6,7 @@ import { RegisterForm } from '../interfaces/register-form.interface';
 import { LoginForm } from '../interfaces/login-form.interface';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
+import { Usuario } from '../models/usuario';
 
 // se define fuera de la class para no tener que usar el this
 const base_url = environment.base_url;
@@ -18,6 +19,7 @@ declare const gapi: any;
 export class UsuarioService {
 
   public auth2: any;
+  public usuario: Usuario;
 
   constructor(
     private httpClient: HttpClient,
@@ -26,6 +28,15 @@ export class UsuarioService {
   ) {
     this.googleInit();
    }
+
+   get token(): string {
+    return localStorage.getItem('token') || '';
+  }
+
+  get uid(): string {
+    return this.usuario.uid || '';
+  }
+
 
   googleInit(): any {
 
@@ -52,7 +63,7 @@ crearUsuario( formData: RegisterForm ): any {
                 tap( (resp: any) => {
                   localStorage.setItem('token', resp.token );
                 })
-              )
+              );
 
   }
 
@@ -91,21 +102,38 @@ crearUsuario( formData: RegisterForm ): any {
   }
 
   validarToken(): Observable<boolean> {
-    const token = localStorage.getItem('token') || '';
+    const token = this.token;
 
     return this.httpClient.get(`${ base_url }/login/renew`, {
       headers: {
         'x-token': token
       }
     }).pipe(
-      tap( (resp: any) => {
+      map( (resp: any) => {
+        console.log(resp);
+        const { email, google, nombre, role, img = '', uid } = resp.usuario;
+        this.usuario = new Usuario( nombre, email, '', img, google, role, uid );
         localStorage.setItem('token', resp.token );
+        return true;
       }),
-      map( resp => true),
       catchError( error => of(false) )
     );
 
   }
 
+  actualizarPerfil( data: { email: string, nombre: string, role: string } ): any {
+
+    data = {
+      ...data,
+      role: this.usuario.role
+    };
+
+    return this.httpClient.put(`${ base_url }/usuarios/${ this.uid }`, data, {
+      headers: {
+        'x-token': this.token
+      }
+    });
+
+  }
 
 }

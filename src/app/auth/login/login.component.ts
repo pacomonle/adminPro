@@ -81,7 +81,9 @@ export class LoginComponent implements OnInit {
 
     }
 
-  async startApp(): any {
+
+
+  async startApp(): Promise<void> {
       await this.usuarioService.googleInit();
       this.auth2 = this.usuarioService.auth2;
 
