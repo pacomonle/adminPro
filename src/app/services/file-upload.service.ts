@@ -22,6 +22,7 @@ export class FileUploadService {
       const url = `${ base_url }/upload/${ tipo }/${ id }`;
       const formData = new FormData();
       formData.append('imagen', archivo);
+      console.log('form-data', formData)
 
       const resp = await fetch( url, {
         method: 'PUT',

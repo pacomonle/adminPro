@@ -1,12 +1,15 @@
 import { Injectable, NgZone } from '@angular/core';
-import { HttpClient } from '@angular/common/http'
-import { catchError, map, tap } from 'rxjs/operators';
+import { HttpClient, HttpEvent } from '@angular/common/http'
+import { catchError, delay, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment.prod';
 import { RegisterForm } from '../interfaces/register-form.interface';
 import { LoginForm } from '../interfaces/login-form.interface';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { Usuario } from '../models/usuario';
+import { CargarUsuario } from '../interfaces/cargar-usuarios.interface';
+
+
 
 // se define fuera de la class para no tener que usar el this
 const base_url = environment.base_url;
@@ -37,7 +40,13 @@ export class UsuarioService {
     return this.usuario.uid || '';
   }
 
-
+  get headers(): any {
+    return {
+      headers: {
+        'x-token': this.token
+      }
+    }
+  }
   googleInit(): any {
 
     return new Promise( resolve => {
@@ -83,7 +92,7 @@ crearUsuario( formData: RegisterForm ): any {
     return this.httpClient.post(`${ base_url }/login/google`, { token } )
                 .pipe(
                   tap( (resp: any) => {
-                    localStorage.setItem('token', resp.token )
+                    localStorage.setItem('token', resp.token );
                   })
                 );
 
@@ -135,5 +144,47 @@ crearUsuario( formData: RegisterForm ): any {
     });
 
   }
+
+  cargarUsuarios( desde: number = 0 ): any{
+
+    const url = `${ base_url }/usuarios?desde=${ desde }`;
+    return this.httpClient.get<CargarUsuario>( url, this.headers ).pipe(delay(500));
+   // return this.httpClient.get<{total: Number, usuarios: Usuario[]}>( url, this.headers )
+    /*  hay que dar el tipado de la resp
+            .pipe(
+              map( resp => {
+                const usuarios = resp.usuarios.map(
+                  user => new Usuario(user.nombre, user.email, '', user.img, user.google, user.role, user.uid )
+                );
+                return {
+                  total: resp.total,
+                  usuarios
+                };
+              })
+            );
+            */
+  }
+
+eliminarUsuario( usuario: Usuario ): any {
+   // console.log(usuario.uid)
+    // /usuarios/5eff3c5054f5efec174e9c84
+    const url = `${ base_url }/usuarios/${ usuario.uid }`;
+    console.log(url);
+    console.log(this.headers)
+    return this.httpClient.delete( url, { headers: {
+      'x-token': this.token
+    }
+  });
+}
+
+guardarUsuario( usuario: Usuario ): any {
+
+  return this.httpClient.put(`${ base_url }/usuarios/${ usuario.uid }`, usuario, this.headers );
+
+}
+
+
+
+
 
 }
