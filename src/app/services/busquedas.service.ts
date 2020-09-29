@@ -52,7 +52,7 @@ export class BusquedasService {
     ): any {
 
     const url = `${ base_url }/todo/coleccion/${ tipo }/${ termino }`;
-    console.log(url, this.headers);
+   // console.log(url, this.headers);
     return this.httpClient.get<any[]>( url, this.headers )
             .pipe(
               map( (resp: any ) => {
@@ -77,5 +77,12 @@ export class BusquedasService {
 
   }
 
+  // tslint:disable-next-line: typedef
+  busquedaGlobal( termino: string ) {
+
+    const url = `${ base_url }/todo/${ termino }`;
+    return this.httpClient.get( url, this.headers );
+
+  }
 
 }

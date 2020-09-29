@@ -32,6 +32,11 @@ export class UsuarioService {
     this.googleInit();
    }
 
+
+   get role(): 'ADMIN_ROLE' | 'USER_ROLE' {
+    return this.usuario.role;
+  }
+
    get token(): string {
     return localStorage.getItem('token') || '';
   }
@@ -62,6 +67,13 @@ export class UsuarioService {
 
   }
 
+  // tslint:disable-next-line: typedef
+  guardarLocalStorage( token: string, menu: any ) {
+
+    localStorage.setItem('token', token );
+    localStorage.setItem('menu', JSON.stringify(menu) );
+
+  }
 
 crearUsuario( formData: RegisterForm ): any {
 
@@ -70,7 +82,7 @@ crearUsuario( formData: RegisterForm ): any {
   return this.httpClient.post(`${ base_url }/usuarios`, formData )
               .pipe(
                 tap( (resp: any) => {
-                  localStorage.setItem('token', resp.token );
+                  this.guardarLocalStorage( resp.token, resp.menu );
                 })
               );
 
@@ -81,7 +93,7 @@ crearUsuario( formData: RegisterForm ): any {
     return this.httpClient.post(`${ base_url }/login`, formData )
                 .pipe(
                   tap( (resp: any) => {
-                    localStorage.setItem('token', resp.token );
+                    this.guardarLocalStorage( resp.token, resp.menu );
                   })
                 );
 
@@ -92,7 +104,7 @@ crearUsuario( formData: RegisterForm ): any {
     return this.httpClient.post(`${ base_url }/login/google`, { token } )
                 .pipe(
                   tap( (resp: any) => {
-                    localStorage.setItem('token', resp.token );
+                    this.guardarLocalStorage( resp.token, resp.menu );
                   })
                 );
 
@@ -100,7 +112,7 @@ crearUsuario( formData: RegisterForm ): any {
 
   logout(): any {
     localStorage.removeItem('token');
-
+    localStorage.removeItem('menu');
     this.auth2.signOut().then(() => {
 
      this.ngZone.run(() => {
